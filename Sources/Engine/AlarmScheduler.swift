@@ -1,6 +1,29 @@
 @preconcurrency import AlarmKit
 import SwiftUI
 
+@MainActor
+protocol AlarmScheduling: AnyObject {
+    func ensureAuthorization() async -> Bool
+    func scheduleCountdown(
+        seconds: TimeInterval,
+        finishing phase: Phase,
+        nextUp: Phase,
+        sound: AlarmSound
+    ) async -> UUID?
+    func allAlarms() -> [Alarm]
+    func isActive(id: UUID) -> Bool
+    func systemState(id: UUID) -> Alarm.State?
+    func cancelAll(except keep: UUID?)
+    func dismiss(id: UUID, state: Alarm.State?)
+    func pause(id: UUID)
+    func resume(id: UUID)
+    func cancel(id: UUID)
+    func stop(id: UUID)
+    func observeAlarms(
+        _ handler: @escaping @MainActor ([Alarm]) -> Void
+    ) -> Task<Void, Never>
+}
+
 /// Thin wrapper around `AlarmManager` (iOS 26 AlarmKit).
 ///
 /// AlarmKit alarms are true system alarms: they present full-screen on the
@@ -13,7 +36,7 @@ import SwiftUI
 /// resume controls. It appears when the alarm is scheduled and disappears
 /// when it's cancelled or stopped.
 @MainActor
-final class AlarmScheduler {
+final class AlarmScheduler: AlarmScheduling {
     private let manager = AlarmManager.shared
 
     /// Returns true if we may schedule alarms, prompting the user if needed.

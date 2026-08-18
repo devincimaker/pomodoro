@@ -110,9 +110,9 @@ struct SettingsScreen: View {
         case .loud:
             "Alarms ring at full volume through the Lock Screen, Silent mode, and Focus until you stop them."
         case .headphones:
-            "Ends with a short cue on AirPods or headphones. If none are connected, you get a haptic and the Time's up screen — no speaker."
+            "Ends with a short cue on AirPods or headphones. If none are connected, you get a haptic and the Time's up screen — no speaker. The countdown still shows on the Lock Screen."
         case .silent:
-            "Ends with a haptic and the Time's up screen. No sound, and no lock-screen alarm."
+            "Ends with a haptic and the Time's up screen. No sound and no lock-screen alarm, but the countdown still shows on the Lock Screen."
         }
     }
 

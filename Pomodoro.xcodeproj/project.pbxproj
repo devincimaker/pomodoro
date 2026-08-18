@@ -14,8 +14,10 @@
 		19099A0760B786F0F2E09468 /* AlarmScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FCE5581FD40B4E786F6527 /* AlarmScheduler.swift */; };
 		1ABB91BF69CF1A9AE27EACB8 /* PomodoroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B24D7E8C0D1F8D90F86785 /* PomodoroApp.swift */; };
 		1AF34892C6CE894723D4C4ED /* PomodoroWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70929838BE2020A8F72C060 /* PomodoroWidgetBundle.swift */; };
+		2563AF4244CA2ACD71903C2D /* QuietLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3716CA2557A4A05DA82631C7 /* QuietLiveActivityController.swift */; };
 		259AE84A027D10A95436B21E /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FCBB280AD7F99E6333A3F4B /* FocusView.swift */; };
 		2D0783C732A2CA346035ADBC /* ProgressScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD18DA796F85C1A172A271B /* ProgressScreen.swift */; };
+		3AC5BB33E5F7A8AFFCBB1E0C /* QuietLockScreenPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5170E0BC1CD36FE704726783 /* QuietLockScreenPolicyTests.swift */; };
 		423237FD8BFA1A3007A1EAD0 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 657E03E31B078D6DC5F1D1C8 /* SettingsScreen.swift */; };
 		4834D37D586D53C79E534055 /* chime.wav in Resources */ = {isa = PBXBuildFile; fileRef = F949031C9077026754B85DB0 /* chime.wav */; };
 		4F91E1EB78140FB439DBDD43 /* TimerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667206E5CE8C07A5065422F3 /* TimerEngine.swift */; };
@@ -23,10 +25,12 @@
 		50AA6117A5A9A4EDF6969341 /* AlarmPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE10543BCCEB9235E222466 /* AlarmPlayer.swift */; };
 		55A39F9B27E7690956C00C70 /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7741B1F3DD104AF905127F /* Phase.swift */; };
 		5714F1CE056617F42C6B92F8 /* AudioRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E7EAC02F57ABE9CD5BDE8 /* AudioRoute.swift */; };
+		61892B92733929495D75FD7C /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2DFE2CADA03898A006A3CDA /* TestSupport.swift */; };
 		7F84FD4CAD652DB06C818B52 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DF48B9D6CF161153EEBCB2 /* Theme.swift */; };
 		81EA0AFB75A607D70B6E91F6 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44B059ABC62F4E556A149A3 /* SettingsStore.swift */; };
-		82712302DD0E6F5AF4BBF603 /* FeedbackMail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5664484913831DDA55B21654 /* FeedbackMail.swift */; };
+		8A8FD124A1E2500FE3F11DF5 /* PomodoroActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4542D0C7308ECD4AFC277 /* PomodoroActivityAttributes.swift */; };
 		90ADE2F9406D32DC2968546A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A45C78AF4AAB90CB3F5023F9 /* Assets.xcassets */; };
+		94A5C27AD19B56FA8D1315B7 /* QuietLockScreenPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56696D3E51376B8474C5798 /* QuietLockScreenPolicy.swift */; };
 		99D9D806374CC526FC4FDFB9 /* PomodoroWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BCD4F85569DC6CA045F232A4 /* PomodoroWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B24FDFD367FDB44EDC552BC0 /* PomodoroSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA939BE69D508445B8896A71 /* PomodoroSession.swift */; };
 		B641DBAEA73C6B16277F8C7B /* AlarmControlIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FA126CB60170D28797B3C4 /* AlarmControlIntents.swift */; };
@@ -36,9 +40,18 @@
 		D8F1B2F06C0E29219D3A1A61 /* TimesUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA06B063B08B854872D7EF /* TimesUpView.swift */; };
 		DD934CC6F43177A7AE85A7A4 /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7741B1F3DD104AF905127F /* Phase.swift */; };
 		E8B99BCD025A408CDF909ABA /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */; };
+		F7D6CA92FED1E5FE082FE6EF /* PomodoroActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4542D0C7308ECD4AFC277 /* PomodoroActivityAttributes.swift */; };
+		FF7507F1E4E7A14BA782536E /* TimerEngineQuietLockScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10E611F3E4BD847BC5D716A /* TimerEngineQuietLockScreenTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		38F1339AA400FB8DB1F18977 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 696C6DDA24A5C4A402796F89 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7903707A219EEB0A29FD23BD;
+			remoteInfo = Pomodoro;
+		};
 		44D0297910EFC26207FF7006 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 696C6DDA24A5C4A402796F89 /* Project object */;
@@ -63,10 +76,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		13AE08D9A779DE0DA2F45A23 /* PomodoroTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PomodoroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A9C80955181DC9D7526BD0C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		30AA06B063B08B854872D7EF /* TimesUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimesUpView.swift; sourceTree = "<group>"; };
+		3716CA2557A4A05DA82631C7 /* QuietLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietLiveActivityController.swift; sourceTree = "<group>"; };
 		4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		5664484913831DDA55B21654 /* FeedbackMail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackMail.swift; sourceTree = "<group>"; };
+		5170E0BC1CD36FE704726783 /* QuietLockScreenPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietLockScreenPolicyTests.swift; sourceTree = "<group>"; };
 		63C3248B9FAB5C802C03D8BA /* Pomodoro.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pomodoro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		657E03E31B078D6DC5F1D1C8 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		667206E5CE8C07A5065422F3 /* TimerEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerEngine.swift; sourceTree = "<group>"; };
@@ -80,13 +95,17 @@
 		A0DF48B9D6CF161153EEBCB2 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A45C78AF4AAB90CB3F5023F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A70929838BE2020A8F72C060 /* PomodoroWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroWidgetBundle.swift; sourceTree = "<group>"; };
+		AAD4542D0C7308ECD4AFC277 /* PomodoroActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroActivityAttributes.swift; sourceTree = "<group>"; };
+		B56696D3E51376B8474C5798 /* QuietLockScreenPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietLockScreenPolicy.swift; sourceTree = "<group>"; };
 		BCD18DA796F85C1A172A271B /* ProgressScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressScreen.swift; sourceTree = "<group>"; };
 		BCD4F85569DC6CA045F232A4 /* PomodoroWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PomodoroWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0FCE5581FD40B4E786F6527 /* AlarmScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmScheduler.swift; sourceTree = "<group>"; };
 		C233328BA9EC537153243953 /* PomodoroLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroLiveActivity.swift; sourceTree = "<group>"; };
 		CA939BE69D508445B8896A71 /* PomodoroSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroSession.swift; sourceTree = "<group>"; };
 		D9B24D7E8C0D1F8D90F86785 /* PomodoroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroApp.swift; sourceTree = "<group>"; };
+		E10E611F3E4BD847BC5D716A /* TimerEngineQuietLockScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerEngineQuietLockScreenTests.swift; sourceTree = "<group>"; };
 		E44B059ABC62F4E556A149A3 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		F2DFE2CADA03898A006A3CDA /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
 		F949031C9077026754B85DB0 /* chime.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = chime.wav; sourceTree = "<group>"; };
 		FAE10543BCCEB9235E222466 /* AlarmPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,6 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				63C3248B9FAB5C802C03D8BA /* Pomodoro.app */,
+				13AE08D9A779DE0DA2F45A23 /* PomodoroTests.xctest */,
 				BCD4F85569DC6CA045F232A4 /* PomodoroWidgets.appex */,
 			);
 			name = Products;
@@ -127,6 +147,7 @@
 				0EBE43278752CE19C66EC6D9 /* Resources */,
 				7781774EB0BEBADEADD3EE0E /* Shared */,
 				E8CB277C7080674CCF4B2801 /* Sources */,
+				B938B63954F5255163F5E1B6 /* Tests */,
 				C914FC0AA4F191BFC2DF2E9B /* Widget */,
 				2E8674BBDE16B20B81905870 /* Products */,
 			);
@@ -137,6 +158,7 @@
 			children = (
 				87FA126CB60170D28797B3C4 /* AlarmControlIntents.swift */,
 				9D7741B1F3DD104AF905127F /* Phase.swift */,
+				AAD4542D0C7308ECD4AFC277 /* PomodoroActivityAttributes.swift */,
 				9AE2151E52685446949FFCB9 /* PomodoroAlarmMetadata.swift */,
 				A0DF48B9D6CF161153EEBCB2 /* Theme.swift */,
 			);
@@ -146,7 +168,6 @@
 		9C0B5EEBF44331E7FFB7AFCD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				5664484913831DDA55B21654 /* FeedbackMail.swift */,
 				6FCBB280AD7F99E6333A3F4B /* FocusView.swift */,
 				BCD18DA796F85C1A172A271B /* ProgressScreen.swift */,
 				1A9C80955181DC9D7526BD0C /* RootView.swift */,
@@ -163,9 +184,21 @@
 				C0FCE5581FD40B4E786F6527 /* AlarmScheduler.swift */,
 				792E7EAC02F57ABE9CD5BDE8 /* AudioRoute.swift */,
 				4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */,
+				3716CA2557A4A05DA82631C7 /* QuietLiveActivityController.swift */,
+				B56696D3E51376B8474C5798 /* QuietLockScreenPolicy.swift */,
 				667206E5CE8C07A5065422F3 /* TimerEngine.swift */,
 			);
 			path = Engine;
+			sourceTree = "<group>";
+		};
+		B938B63954F5255163F5E1B6 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				5170E0BC1CD36FE704726783 /* QuietLockScreenPolicyTests.swift */,
+				F2DFE2CADA03898A006A3CDA /* TestSupport.swift */,
+				E10E611F3E4BD847BC5D716A /* TimerEngineQuietLockScreenTests.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		C914FC0AA4F191BFC2DF2E9B /* Widget */ = {
@@ -211,6 +244,24 @@
 			productReference = 63C3248B9FAB5C802C03D8BA /* Pomodoro.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D067DB411932CA24884D3B13 /* PomodoroTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B84A069775F4B73BC7BF94CF /* Build configuration list for PBXNativeTarget "PomodoroTests" */;
+			buildPhases = (
+				4FB1D51383FB58AA940E321A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D359B52E97AC4F25C03DAACD /* PBXTargetDependency */,
+			);
+			name = PomodoroTests;
+			packageProductDependencies = (
+			);
+			productName = PomodoroTests;
+			productReference = 13AE08D9A779DE0DA2F45A23 /* PomodoroTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		D5F73F72D2C1B5E3D50B8C85 /* PomodoroWidgets */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C5FE16CAEB64FE6399EE4F14 /* Build configuration list for PBXNativeTarget "PomodoroWidgets" */;
@@ -254,6 +305,7 @@
 			projectRoot = "";
 			targets = (
 				7903707A219EEB0A29FD23BD /* Pomodoro */,
+				D067DB411932CA24884D3B13 /* PomodoroTests */,
 				D5F73F72D2C1B5E3D50B8C85 /* PomodoroWidgets */,
 			);
 		};
@@ -280,10 +332,21 @@
 			files = (
 				14360AD28CD8DEB69B71DE77 /* AlarmControlIntents.swift in Sources */,
 				DD934CC6F43177A7AE85A7A4 /* Phase.swift in Sources */,
+				8A8FD124A1E2500FE3F11DF5 /* PomodoroActivityAttributes.swift in Sources */,
 				11E46678A4B0345900746B73 /* PomodoroAlarmMetadata.swift in Sources */,
 				100702C75FAE05306C3A2CCB /* PomodoroLiveActivity.swift in Sources */,
 				1AF34892C6CE894723D4C4ED /* PomodoroWidgetBundle.swift in Sources */,
 				D6A75907625B6F979E1064F9 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4FB1D51383FB58AA940E321A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AC5BB33E5F7A8AFFCBB1E0C /* QuietLockScreenPolicyTests.swift in Sources */,
+				61892B92733929495D75FD7C /* TestSupport.swift in Sources */,
+				FF7507F1E4E7A14BA782536E /* TimerEngineQuietLockScreenTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,14 +358,16 @@
 				50AA6117A5A9A4EDF6969341 /* AlarmPlayer.swift in Sources */,
 				19099A0760B786F0F2E09468 /* AlarmScheduler.swift in Sources */,
 				5714F1CE056617F42C6B92F8 /* AudioRoute.swift in Sources */,
-				82712302DD0E6F5AF4BBF603 /* FeedbackMail.swift in Sources */,
 				259AE84A027D10A95436B21E /* FocusView.swift in Sources */,
 				E8B99BCD025A408CDF909ABA /* NotificationManager.swift in Sources */,
 				55A39F9B27E7690956C00C70 /* Phase.swift in Sources */,
+				F7D6CA92FED1E5FE082FE6EF /* PomodoroActivityAttributes.swift in Sources */,
 				0116859E145C91E9724663A2 /* PomodoroAlarmMetadata.swift in Sources */,
 				1ABB91BF69CF1A9AE27EACB8 /* PomodoroApp.swift in Sources */,
 				B24FDFD367FDB44EDC552BC0 /* PomodoroSession.swift in Sources */,
 				2D0783C732A2CA346035ADBC /* ProgressScreen.swift in Sources */,
+				2563AF4244CA2ACD71903C2D /* QuietLiveActivityController.swift in Sources */,
+				94A5C27AD19B56FA8D1315B7 /* QuietLockScreenPolicy.swift in Sources */,
 				D14DF730DA31263DC1717047 /* RootView.swift in Sources */,
 				423237FD8BFA1A3007A1EAD0 /* SettingsScreen.swift in Sources */,
 				81EA0AFB75A607D70B6E91F6 /* SettingsStore.swift in Sources */,
@@ -315,6 +380,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		D359B52E97AC4F25C03DAACD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7903707A219EEB0A29FD23BD /* Pomodoro */;
+			targetProxy = 38F1339AA400FB8DB1F18977 /* PBXContainerItemProxy */;
+		};
 		E0C0665669A4A1BE457661BF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D5F73F72D2C1B5E3D50B8C85 /* PomodoroWidgets */;
@@ -504,6 +574,26 @@
 			};
 			name = Release;
 		};
+		AFB518EE27D80685F93EE959 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				ENABLE_TESTING_SEARCH_PATHS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.devinci.Pomodoro.tests;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pomodoro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pomodoro";
+			};
+			name = Release;
+		};
 		CEBBBBB923CEF08235AC4782 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -524,6 +614,26 @@
 			};
 			name = Debug;
 		};
+		FD08440BC9111BF80CAB4950 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				ENABLE_TESTING_SEARCH_PATHS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.devinci.Pomodoro.tests;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pomodoro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pomodoro";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -541,6 +651,15 @@
 			buildConfigurations = (
 				CEBBBBB923CEF08235AC4782 /* Debug */,
 				512B3EE945CEE8DEC77C6F51 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B84A069775F4B73BC7BF94CF /* Build configuration list for PBXNativeTarget "PomodoroTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD08440BC9111BF80CAB4950 /* Debug */,
+				AFB518EE27D80685F93EE959 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

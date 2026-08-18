@@ -128,3 +128,57 @@ struct StartNextPhaseIntent: LiveActivityIntent {
         return .result()
     }
 }
+
+// MARK: - Quiet (app-owned) Live Activity
+
+/// Pause / resume / stop for the app-owned lock-screen activity used when
+/// AlarmKit is not scheduled. These run in the app process and talk to
+/// `TimerEngine` directly — there is no system alarm to drive.
+
+struct PauseQuietPomodoroIntent: LiveActivityIntent {
+    static let title: LocalizedStringResource = "Pause Pomodoro"
+    static let description = IntentDescription("Pauses the running pomodoro countdown.")
+    static let isDiscoverable = false
+
+    func perform() async throws -> some IntentResult {
+        #if !POMODORO_WIDGET
+        await resolveEngine()?.pause()
+        #endif
+        return .result()
+    }
+}
+
+struct ResumeQuietPomodoroIntent: LiveActivityIntent {
+    static let title: LocalizedStringResource = "Resume Pomodoro"
+    static let description = IntentDescription("Resumes the paused pomodoro countdown.")
+    static let isDiscoverable = false
+
+    func perform() async throws -> some IntentResult {
+        #if !POMODORO_WIDGET
+        await resolveEngine()?.start()
+        #endif
+        return .result()
+    }
+}
+
+struct StopQuietPomodoroIntent: LiveActivityIntent {
+    static let title: LocalizedStringResource = "Stop Pomodoro"
+    static let description = IntentDescription("Stops the pomodoro countdown and dismisses the timer.")
+    static let isDiscoverable = false
+
+    func perform() async throws -> some IntentResult {
+        #if !POMODORO_WIDGET
+        await resolveEngine()?.reset()
+        #endif
+        return .result()
+    }
+}
+
+#if !POMODORO_WIDGET
+@MainActor
+private func resolveEngine() async -> TimerEngine? {
+    if let engine = TimerEngine.current { return engine }
+    try? await Task.sleep(for: .milliseconds(300))
+    return TimerEngine.current
+}
+#endif

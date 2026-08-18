@@ -37,7 +37,8 @@ enum AlarmSound: String, Codable, Sendable, CaseIterable, Identifiable {
 ///
 /// Loud uses AlarmKit (speaker, Silent/Focus breakthrough, lock-screen
 /// Live Activity). Headphones and Silent leave AlarmKit so a cowork
-/// session cannot blast the room.
+/// session cannot blast the room; they still show an app-owned Live
+/// Activity on the Lock Screen.
 enum AlertStyle: String, Codable, Sendable, CaseIterable, Identifiable {
     case loud
     case headphones

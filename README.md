@@ -40,6 +40,7 @@ Shared/                      Compiled into BOTH targets
   AlarmControlIntents.swift  Pause/Resume/Stop LiveActivityIntents
 Widget/                      PomodoroWidgets extension target
   PomodoroWidgetBundle.swift @main widget bundle
+  PomodoroActivityAttributes.swift App-owned Live Activity (quiet styles)
   PomodoroLiveActivity.swift Lock Screen + Dynamic Island countdown UI
 ```
 
@@ -61,8 +62,10 @@ Widget/                      PomodoroWidgets extension target
   AlarmKit, so they cannot blast the speaker or break Silent/Focus. Headphones
   plays a one-shot cue only if AirPods or headphones are the current route;
   otherwise (and always in Silent) the end is haptic + the Time's up screen.
-  A silent local notification still banners when the phone is locked. Switching
-  Loud → quiet mid-run cancels the armed system alarm.
+  A silent local notification still banners when the phone is locked. The
+  countdown still appears on the Lock Screen and Dynamic Island via an
+  app-owned Live Activity. Switching Loud → quiet mid-run cancels the armed
+  system alarm and swaps in that activity.
 - **Completion UI:** a foreground `Task` sleeping until `endDate` presents the
   in-app takeover; reopened late → `checkForCompletion()` on scene activation
   (and if the alarm was already stopped from the lock screen, no re-ring).
@@ -99,9 +102,9 @@ extension:
   killed (cycle position restarts, as on any relaunch).
 - Theme matches the app: warm near-black background, tomato-orange accent,
   cream rounded-light digits.
-- Only reachable on the AlarmKit path; if alarm permission is denied, **or
-  the alert style is Headphones/Silent**, there is no Live Activity (the
-  widget is owned by the system alarm).
+- Loud uses AlarmKit's activity. Headphones, Silent, and Loud-with-permission
+  denied start an app-owned Live Activity (`PomodoroActivityAttributes`) so
+  the countdown is still visible without a ringing alarm.
 - Note: a lock-screen resume recomputes the end date app-side from the stored
   remaining time, so app and system countdowns can drift by the async-update
   latency (sub-second in practice).

@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class SettingsStore {
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
 
     var focusMinutes: Int {
         didSet { defaults.set(focusMinutes, forKey: "focusMinutes") }
@@ -26,8 +26,9 @@ final class SettingsStore {
         didSet { defaults.set(alertStyle.rawValue, forKey: "alertStyle") }
     }
 
-    init() {
-        let d = UserDefaults.standard
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        let d = defaults
         focusMinutes = d.object(forKey: "focusMinutes") as? Int ?? 25
         shortBreakMinutes = d.object(forKey: "shortBreakMinutes") as? Int ?? 5
         longBreakMinutes = d.object(forKey: "longBreakMinutes") as? Int ?? 15

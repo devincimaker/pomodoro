@@ -14,9 +14,12 @@ import ActivityKit
 ///    It rings at full volume through the lock screen, Silent mode, and Focus,
 ///    and keeps ringing until stopped — a true alarm, not a notification.
 ///    The system alarm is the source of truth for pause/resume/cancel. The
-///    in-app clock only mirrors it.
-/// 2. **Fallback.** If alarm permission is denied, we fall back to a local
-///    notification (background) plus an in-app synthesized alarm (foreground).
+///    in-app clock only mirrors it. AlarmKit also owns the lock-screen
+///    Live Activity on this path.
+/// 2. **Fallback / quiet.** Headphones, Silent, and Loud-with-permission
+///    denied do not schedule AlarmKit. A local notification covers the
+///    locked-phone banner, and an app-owned Live Activity keeps the
+///    countdown on the Lock Screen without a ringing alarm.
 ///
 /// A foreground `Task` sleeping until `endDate` drives the in-app "Time's up"
 /// takeover; it must never complete a phase while AlarmKit is still counting
@@ -49,7 +52,9 @@ final class TimerEngine {
 
     private let settings: SettingsStore
     private let modelContext: ModelContext
-    private let alarmKit = AlarmScheduler()
+    private let defaults: UserDefaults
+    private let alarmKit: any AlarmScheduling
+    private let quietLockScreen: any QuietLiveActivityControlling
     private let fallbackPlayer = AlarmPlayer()
     private var completionTask: Task<Void, Never>?
     private var alarmObservationTask: Task<Void, Never>?
@@ -61,14 +66,28 @@ final class TimerEngine {
     /// True while we are cancelling/scheduling so a transient empty alarm
     /// list is not treated as "user dismissed the Live Activity".
     private var isMutatingAlarms = false
+    /// False while Loud is still trying to arm AlarmKit, so we do not flash
+    /// an app-owned Live Activity on top of the system one.
+    private var alarmKitAttempted = true
 
-    init(settings: SettingsStore, modelContext: ModelContext) {
+    init(
+        settings: SettingsStore,
+        modelContext: ModelContext,
+        defaults: UserDefaults = .standard,
+        alarmKit: any AlarmScheduling = AlarmScheduler(),
+        quietLockScreen: any QuietLiveActivityControlling = QuietLiveActivityController()
+    ) {
         self.settings = settings
         self.modelContext = modelContext
+        self.defaults = defaults
+        self.alarmKit = alarmKit
+        self.quietLockScreen = quietLockScreen
         restorePersisted()
+        alarmKitAttempted = true
         TimerEngine.current = self
         reconcileWithSystem()
         observeSystemAlarms()
+        syncQuietLockScreen()
     }
 
     // MARK: Derived values
@@ -143,11 +162,14 @@ final class TimerEngine {
             let endDate = Date.now.addingTimeInterval(duration)
             applyRunning(endDate: endDate)
             alarmKit.resume(id: id)
+            syncQuietLockScreen()
             return
         }
 
+        alarmKitAttempted = !settings.alertStyle.usesAlarmKit
         let endDate = Date.now.addingTimeInterval(duration)
         applyRunning(endDate: endDate)
+        syncQuietLockScreen()
         Task { await armAlarm(seconds: duration) }
     }
 
@@ -158,6 +180,7 @@ final class TimerEngine {
         if let id = currentAlarmID {
             alarmKit.pause(id: id)
         }
+        syncQuietLockScreen()
     }
 
     func togglePlayPause() {
@@ -185,6 +208,7 @@ final class TimerEngine {
         fallbackPlayer.stop()
         isAlarmPresented = false
         persist()
+        syncQuietLockScreen()
     }
 
     /// Called on scene activation: adopt whatever AlarmKit is doing, including
@@ -209,21 +233,29 @@ final class TimerEngine {
         switch settings.alertStyle {
         case .loud:
             NotificationManager.shared.cancelEndNotification()
+            alarmKitAttempted = false
             guard case .running(let endDate) = state else {
                 persist()
+                syncQuietLockScreen()
                 return
             }
             let remaining = endDate.timeIntervalSinceNow
-            guard remaining > 1 else { return }
+            guard remaining > 1 else {
+                persist()
+                syncQuietLockScreen()
+                return
+            }
+            syncQuietLockScreen()
             Task { await armAlarm(seconds: remaining) }
         case .headphones, .silent:
             isMutatingAlarms = true
             if let id = currentAlarmID {
-                alarmKit.dismiss(id: id)
+                alarmKit.dismiss(id: id, state: nil)
                 currentAlarmID = nil
             }
             alarmKit.cancelAll(except: nil)
             isMutatingAlarms = false
+            alarmKitAttempted = true
             if case .running(let endDate) = state {
                 NotificationManager.shared.requestAuthorizationIfNeeded()
                 NotificationManager.shared.scheduleEndNotification(
@@ -233,6 +265,7 @@ final class TimerEngine {
                 )
             }
             persist()
+            syncQuietLockScreen()
         }
     }
 
@@ -250,7 +283,7 @@ final class TimerEngine {
         if currentAlarmID == nil || currentAlarmID == alarmID {
             abandonPhase(cancelAlarm: true, alarmID: alarmID)
         } else {
-            alarmKit.dismiss(id: alarmID)
+            alarmKit.dismiss(id: alarmID, state: nil)
         }
     }
 
@@ -263,7 +296,7 @@ final class TimerEngine {
     /// bookkeeping and session recording.
     func handleLockScreenAdvance(finishedRaw: String, alarmID: UUID) async {
         guard let finished = Phase(rawValue: finishedRaw) else {
-            alarmKit.dismiss(id: alarmID)
+            alarmKit.dismiss(id: alarmID, state: nil)
             return
         }
 
@@ -286,7 +319,7 @@ final class TimerEngine {
         }
 
         // 2. Silence the alarm and tear down any ringing state.
-        alarmKit.dismiss(id: alarmID)
+        alarmKit.dismiss(id: alarmID, state: nil)
         if currentAlarmID == alarmID { currentAlarmID = nil }
         fallbackPlayer.stop()
         isAlarmPresented = false
@@ -308,7 +341,11 @@ final class TimerEngine {
         let gen = armGeneration
         isMutatingAlarms = true
         defer {
-            if gen == armGeneration { isMutatingAlarms = false }
+            if gen == armGeneration {
+                isMutatingAlarms = false
+                alarmKitAttempted = true
+                syncQuietLockScreen()
+            }
         }
 
         alarmKit.cancelAll(except: nil)
@@ -342,7 +379,7 @@ final class TimerEngine {
             sound: settings.alarmSound
         ) {
             guard gen == armGeneration else {
-                alarmKit.dismiss(id: id)
+                alarmKit.dismiss(id: id, state: nil)
                 return
             }
             currentAlarmID = id
@@ -531,13 +568,14 @@ final class TimerEngine {
         isAlarmPresented = false
         if cancelAlarm {
             if let id = currentAlarmID ?? alarmID {
-                alarmKit.dismiss(id: id)
+                alarmKit.dismiss(id: id, state: nil)
             }
             alarmKit.cancelAll(except: nil)
         }
         currentAlarmID = nil
         state = .idle
         persist()
+        syncQuietLockScreen()
     }
 
     private func scheduleCompletion(at endDate: Date) {
@@ -594,6 +632,7 @@ final class TimerEngine {
         advance(recording: true)
         presentCompletionAlert()
         persist()
+        syncQuietLockScreen()
     }
 
     private func presentCompletionAlert() {
@@ -684,8 +723,33 @@ final class TimerEngine {
         static let isAlarmPresented = "engine.isAlarmPresented"
     }
 
+    /// App-owned lock-screen activity, used when AlarmKit is not presenting.
+    private var usesAlarmKitDisplay: Bool {
+        currentAlarmID != nil || (settings.alertStyle.usesAlarmKit && !alarmKitAttempted)
+    }
+
+    private func syncQuietLockScreen() {
+        let timer: QuietLockScreenInputState
+        switch state {
+        case .idle:
+            timer = .idle
+        case .running(let endDate):
+            timer = .running(endDate: endDate)
+        case .paused(let remaining):
+            timer = .paused(remaining: remaining)
+        }
+        quietLockScreen.sync(
+            QuietLockScreenPolicy.snapshot(
+                usesAlarmKitDisplay: usesAlarmKitDisplay,
+                timer: timer,
+                phase: phase,
+                isAlarmPresented: isAlarmPresented,
+                totalDuration: settings.duration(for: phase)
+            )
+        )
+    }
+
     private func persist() {
-        let defaults = UserDefaults.standard
         defaults.set(phase.rawValue, forKey: PersistKey.phase)
         defaults.set(completedInCycle, forKey: PersistKey.completedInCycle)
         defaults.set(finishedPhase.rawValue, forKey: PersistKey.finishedPhase)
@@ -712,7 +776,6 @@ final class TimerEngine {
     }
 
     private func restorePersisted() {
-        let defaults = UserDefaults.standard
         if let raw = defaults.string(forKey: PersistKey.phase),
            let restored = Phase(rawValue: raw) {
             phase = restored

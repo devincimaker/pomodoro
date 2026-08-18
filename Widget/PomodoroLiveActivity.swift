@@ -6,79 +6,138 @@ import AppIntents
 
 /// Lock Screen + Dynamic Island presentation for the running pomodoro.
 ///
-/// AlarmKit owns the Live Activity lifecycle: it appears when a countdown
-/// alarm is scheduled and disappears when the alarm is cancelled or stopped —
-/// which is exactly "only visible while a pomodoro is running". This widget
-/// only supplies the UI for the countdown / paused states (the full-screen
-/// ringing alert stays system-rendered).
+/// Two configurations share the same chrome:
+/// - AlarmKit's countdown activity (Loud)
+/// - The app-owned `PomodoroActivityAttributes` activity (Headphones / Silent,
+///   and Loud when alarm permission is denied)
 struct PomodoroLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: AlarmAttributes<PomodoroAlarmMetadata>.self) { context in
-            LockScreenView(context: context)
-                .activityBackgroundTint(Color.appBackground.opacity(0.96))
-                .activitySystemActionForegroundColor(Color.pomodoroOrange)
+            LockScreenBanner(
+                phase: context.attributes.metadata?.phase ?? .focus,
+                mode: lockScreenMode(of: context.state.mode),
+                controls: .alarmKit(alarmID: context.state.alarmID)
+            )
+            .activityBackgroundTint(Color.appBackground.opacity(0.96))
+            .activitySystemActionForegroundColor(Color.pomodoroOrange)
         } dynamicIsland: { context in
-            DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) {
-                    PhaseLabel(phase: phase(of: context))
-                        .padding(.leading, 4)
-                }
-                DynamicIslandExpandedRegion(.trailing) {
-                    AlarmControls(state: context.state, phase: phase(of: context), compact: true)
-                        .padding(.trailing, 4)
-                }
-                DynamicIslandExpandedRegion(.bottom) {
-                    VStack(spacing: 8) {
-                        CountdownDigits(mode: context.state.mode)
-                            .font(.system(size: 40, weight: .light, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(Color.cream)
-                        SegmentProgress(mode: context.state.mode)
-                    }
-                    .padding(.horizontal, 4)
-                }
-            } compactLeading: {
-                Image(systemName: compactIcon(for: context.state.mode))
-                    .foregroundStyle(Color.pomodoroOrange)
-            } compactTrailing: {
-                CompactCountdown(mode: context.state.mode)
-            } minimal: {
-                Image(systemName: compactIcon(for: context.state.mode))
-                    .foregroundStyle(Color.pomodoroOrange)
-            }
-            .keylineTint(Color.pomodoroOrange)
+            island(
+                phase: phase(of: context),
+                mode: lockScreenMode(of: context.state.mode),
+                controls: .alarmKit(alarmID: context.state.alarmID)
+            )
         }
     }
 
     private func phase(of context: ActivityViewContext<AlarmAttributes<PomodoroAlarmMetadata>>) -> Phase {
         context.attributes.metadata?.phase ?? .focus
     }
+}
 
-    private func compactIcon(for mode: AlarmPresentationState.Mode) -> String {
-        if case .paused = mode { return "pause.fill" }
-        return "timer"
+/// App-owned Live Activity used when AlarmKit is not scheduled.
+struct QuietPomodoroLiveActivity: Widget {
+    var body: some WidgetConfiguration {
+        ActivityConfiguration(for: PomodoroActivityAttributes.self) { context in
+            LockScreenBanner(
+                phase: context.state.phase,
+                mode: context.state.lockScreenMode,
+                controls: .quiet
+            )
+            .activityBackgroundTint(Color.appBackground.opacity(0.96))
+            .activitySystemActionForegroundColor(Color.pomodoroOrange)
+        } dynamicIsland: { context in
+            island(
+                phase: context.state.phase,
+                mode: context.state.lockScreenMode,
+                controls: .quiet
+            )
+        }
+    }
+}
+
+private func island(
+    phase: Phase,
+    mode: PomodoroLockScreenMode,
+    controls: LockScreenControlKind
+) -> DynamicIsland {
+    DynamicIsland {
+        DynamicIslandExpandedRegion(.leading) {
+            PhaseLabel(phase: phase)
+                .padding(.leading, 4)
+        }
+        DynamicIslandExpandedRegion(.trailing) {
+            AlarmControls(mode: mode, phase: phase, compact: true, controls: controls)
+                .padding(.trailing, 4)
+        }
+        DynamicIslandExpandedRegion(.bottom) {
+            VStack(spacing: 8) {
+                CountdownDigits(mode: mode)
+                    .font(.system(size: 40, weight: .light, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.cream)
+                SegmentProgress(mode: mode)
+            }
+            .padding(.horizontal, 4)
+        }
+    } compactLeading: {
+        Image(systemName: compactIcon(for: mode))
+            .foregroundStyle(Color.pomodoroOrange)
+    } compactTrailing: {
+        CompactCountdown(mode: mode)
+    } minimal: {
+        Image(systemName: compactIcon(for: mode))
+            .foregroundStyle(Color.pomodoroOrange)
+    }
+    .keylineTint(Color.pomodoroOrange)
+}
+
+private func compactIcon(for mode: PomodoroLockScreenMode) -> String {
+    if case .paused = mode { return "pause.fill" }
+    return "timer"
+}
+
+private func lockScreenMode(of mode: AlarmPresentationState.Mode) -> PomodoroLockScreenMode {
+    switch mode {
+    case .countdown(let countdown):
+        .countdown(endDate: countdown.fireDate, totalDuration: countdown.totalCountdownDuration)
+    case .paused(let paused):
+        .paused(
+            remaining: max(0, paused.totalCountdownDuration - paused.previouslyElapsedDuration),
+            totalDuration: paused.totalCountdownDuration
+        )
+    case .alert:
+        .finished
+    @unknown default:
+        .finished
     }
 }
 
 // MARK: - Lock Screen
 
-private struct LockScreenView: View {
-    let context: ActivityViewContext<AlarmAttributes<PomodoroAlarmMetadata>>
+private enum LockScreenControlKind {
+    case alarmKit(alarmID: UUID)
+    case quiet
+}
+
+private struct LockScreenBanner: View {
+    let phase: Phase
+    let mode: PomodoroLockScreenMode
+    let controls: LockScreenControlKind
 
     var body: some View {
         VStack(spacing: 10) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    PhaseLabel(phase: context.attributes.metadata?.phase ?? .focus)
-                    CountdownDigits(mode: context.state.mode)
+                    PhaseLabel(phase: phase)
+                    CountdownDigits(mode: mode)
                         .font(.system(size: 44, weight: .light, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(Color.cream)
                 }
                 Spacer(minLength: 12)
-                AlarmControls(state: context.state, phase: context.attributes.metadata?.phase ?? .focus, compact: false)
+                AlarmControls(mode: mode, phase: phase, compact: false, controls: controls)
             }
-            SegmentProgress(mode: context.state.mode)
+            SegmentProgress(mode: mode)
         }
         .padding(16)
     }
@@ -101,34 +160,28 @@ private struct PhaseLabel: View {
 /// Big countdown digits. While counting down the text ticks system-side
 /// (no timeline needed); while paused it shows the frozen remaining time.
 private struct CountdownDigits: View {
-    let mode: AlarmPresentationState.Mode
+    let mode: PomodoroLockScreenMode
 
     var body: some View {
         switch mode {
-        case .countdown(let countdown):
+        case .countdown(let endDate, let totalDuration):
             Text(
-                timerInterval: Self.range(for: countdown),
+                timerInterval: Self.range(endDate: endDate, totalDuration: totalDuration),
                 countsDown: true,
                 showsHours: false
             )
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            // fireDate only changes on pause/resume. Pinning identity
-            // stops AlarmKit refreshes from remounting the timer (skipped seconds).
-            .id(countdown.fireDate)
-        case .paused(let paused):
-            Text(Self.formatted(max(0, paused.totalCountdownDuration - paused.previouslyElapsedDuration)))
-        case .alert:
+            .id(endDate)
+        case .paused(let remaining, _):
+            Text(Self.formatted(max(0, remaining)))
+        case .finished:
             Text("0:00")
-        @unknown default:
-            Text("--:--")
         }
     }
 
-    /// Full phase window ending at the alarm fire date. `startDate` can drift
-    /// on system refreshes; this range stays put so the timer does not skip.
-    static func range(for countdown: AlarmPresentationState.Mode.Countdown) -> ClosedRange<Date> {
-        countdown.fireDate.addingTimeInterval(-countdown.totalCountdownDuration)...countdown.fireDate
+    static func range(endDate: Date, totalDuration: TimeInterval) -> ClosedRange<Date> {
+        endDate.addingTimeInterval(-totalDuration)...endDate
     }
 
     static func formatted(_ interval: TimeInterval) -> String {
@@ -139,13 +192,13 @@ private struct CountdownDigits: View {
 
 /// Narrow countdown for the compact Dynamic Island slot.
 private struct CompactCountdown: View {
-    let mode: AlarmPresentationState.Mode
+    let mode: PomodoroLockScreenMode
 
     var body: some View {
         switch mode {
-        case .countdown(let countdown):
+        case .countdown(let endDate, let totalDuration):
             Text(
-                timerInterval: CountdownDigits.range(for: countdown),
+                timerInterval: CountdownDigits.range(endDate: endDate, totalDuration: totalDuration),
                 countsDown: true,
                 showsHours: false
             )
@@ -153,12 +206,12 @@ private struct CompactCountdown: View {
                 .multilineTextAlignment(.trailing)
                 .frame(width: 58, alignment: .trailing)
                 .foregroundStyle(Color.cream)
-                .id(countdown.fireDate)
-        case .paused(let paused):
-            Text(CountdownDigits.formatted(max(0, paused.totalCountdownDuration - paused.previouslyElapsedDuration)))
+                .id(endDate)
+        case .paused(let remaining, _):
+            Text(CountdownDigits.formatted(max(0, remaining)))
                 .monospacedDigit()
                 .foregroundStyle(Color.cream.opacity(0.6))
-        default:
+        case .finished:
             Image(systemName: "bell.fill")
                 .foregroundStyle(Color.pomodoroOrange)
         }
@@ -168,24 +221,25 @@ private struct CompactCountdown: View {
 /// Thin progress bar through the current running segment — the linear
 /// counterpart of the app's progress ring.
 private struct SegmentProgress: View {
-    let mode: AlarmPresentationState.Mode
+    let mode: PomodoroLockScreenMode
 
     var body: some View {
         Group {
             switch mode {
-            case .countdown(let countdown):
+            case .countdown(let endDate, let totalDuration):
                 ProgressView(
-                    timerInterval: countdown.fireDate.addingTimeInterval(-countdown.totalCountdownDuration)...countdown.fireDate,
+                    timerInterval: endDate.addingTimeInterval(-totalDuration)...endDate,
                     countsDown: false,
                     label: {},
                     currentValueLabel: {}
                 )
-            case .paused(let paused):
+            case .paused(let remaining, let totalDuration):
+                let elapsed = max(0, totalDuration - remaining)
                 ProgressView(
-                    value: min(max(paused.previouslyElapsedDuration, 0), paused.totalCountdownDuration),
-                    total: max(paused.totalCountdownDuration, 1)
+                    value: min(elapsed, totalDuration),
+                    total: max(totalDuration, 1)
                 )
-            default:
+            case .finished:
                 ProgressView(value: 1, total: 1)
             }
         }
@@ -196,44 +250,57 @@ private struct SegmentProgress: View {
     }
 }
 
-/// Pause / resume buttons while counting down, and stop / start-next while
-/// ringing — all LiveActivityIntents that drive the real AlarmKit alarm (the
-/// app syncs itself via `alarmUpdates`, and the chaining intents route
-/// through TimerEngine in the app's process).
+/// Pause / resume / stop. AlarmKit buttons drive `AlarmManager`; quiet
+/// buttons drive `TimerEngine` so there is no system alarm to talk to.
 private struct AlarmControls: View {
-    let state: AlarmPresentationState
+    let mode: PomodoroLockScreenMode
     let phase: Phase
     let compact: Bool
+    let controls: LockScreenControlKind
 
     private var primarySize: CGFloat { compact ? 44 : 54 }
 
     var body: some View {
-        switch state.mode {
+        switch mode {
         case .countdown:
             HStack(spacing: compact ? 10 : 14) {
                 stopButton
-                primaryButton(
-                    intent: PausePomodoroIntent(alarmID: state.alarmID),
-                    systemImage: "pause.fill"
-                )
+                pauseButton
             }
         case .paused:
             HStack(spacing: compact ? 10 : 14) {
                 stopButton
+                resumeButton
+            }
+        case .finished:
+            // Ringing AlarmKit alert: jump into the next phase. Quiet styles
+            // never reach this — they hide the activity at completion.
+            if case .alarmKit(let alarmID) = controls {
                 primaryButton(
-                    intent: ResumePomodoroIntent(alarmID: state.alarmID),
+                    intent: StartNextPhaseIntent(finishedPhase: phase, alarmID: alarmID),
                     systemImage: "play.fill"
                 )
             }
-        case .alert:
-            // Ringing: one button — jump straight into the next phase
-            // (mirrors the system alert's single "Focus"/"Break" button).
-            primaryButton(
-                intent: StartNextPhaseIntent(finishedPhase: phase, alarmID: state.alarmID),
-                systemImage: "play.fill"
-            )
-        @unknown default:
-            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private var pauseButton: some View {
+        switch controls {
+        case .alarmKit(let alarmID):
+            primaryButton(intent: PausePomodoroIntent(alarmID: alarmID), systemImage: "pause.fill")
+        case .quiet:
+            primaryButton(intent: PauseQuietPomodoroIntent(), systemImage: "pause.fill")
+        }
+    }
+
+    @ViewBuilder
+    private var resumeButton: some View {
+        switch controls {
+        case .alarmKit(let alarmID):
+            primaryButton(intent: ResumePomodoroIntent(alarmID: alarmID), systemImage: "play.fill")
+        case .quiet:
+            primaryButton(intent: ResumeQuietPomodoroIntent(), systemImage: "play.fill")
         }
     }
 
@@ -251,14 +318,27 @@ private struct AlarmControls: View {
 
     private var stopButton: some View {
         let size = compact ? 36.0 : 44.0
-        return Button(intent: StopPomodoroIntent(alarmID: state.alarmID)) {
-            Image(systemName: "xmark")
-                .font(.system(size: compact ? 13 : 15, weight: .bold))
-                .foregroundStyle(Color.cream.opacity(0.9))
-                .frame(width: size, height: size)
-                .background(Circle().fill(Color.white.opacity(0.14)))
+        return Group {
+            switch controls {
+            case .alarmKit(let alarmID):
+                Button(intent: StopPomodoroIntent(alarmID: alarmID)) {
+                    stopGlyph(size: size)
+                }
+            case .quiet:
+                Button(intent: StopQuietPomodoroIntent()) {
+                    stopGlyph(size: size)
+                }
+            }
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Stop timer")
+    }
+
+    private func stopGlyph(size: CGFloat) -> some View {
+        Image(systemName: "xmark")
+            .font(.system(size: compact ? 13 : 15, weight: .bold))
+            .foregroundStyle(Color.cream.opacity(0.9))
+            .frame(width: size, height: size)
+            .background(Circle().fill(Color.white.opacity(0.14)))
     }
 }

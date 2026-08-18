@@ -45,6 +45,10 @@ final class TimerEngine {
     private(set) var phase: Phase = .focus
     /// Focus blocks completed in the current cycle (0..<cadence).
     private(set) var completedInCycle = 0
+    /// Last time this cadence group was used. After
+    /// `CycleGroupPolicy.inactivityLimit` of idle time the next focus
+    /// starts a new group; recorded sessions are not deleted.
+    private var lastCycleActivityAt: Date?
     /// When true, the full-screen "Time's up" alarm takeover is presented.
     var isAlarmPresented = false
     /// The phase that just finished (drives copy on the Time's up screen).
@@ -134,6 +138,16 @@ final class TimerEngine {
         max(0, settings.longBreakCadence - completedInCycle)
     }
 
+    /// True when the current short-break / long-break group has progress
+    /// the user can close without waiting for the inactivity limit.
+    var canStartNewCycle: Bool {
+        CycleGroupPolicy.canStartNewCycle(
+            completedInCycle: completedInCycle,
+            phase: phase,
+            isAlarmPresented: isAlarmPresented
+        )
+    }
+
     /// What comes after the current phase, given cycle position.
     var nextPhase: Phase {
         switch phase {
@@ -147,6 +161,7 @@ final class TimerEngine {
     // MARK: Controls
 
     func start() {
+        expireStaleCycleIfNeeded()
         guard !isRunning else { return }
         let duration: TimeInterval
         let resuming: Bool
@@ -213,6 +228,13 @@ final class TimerEngine {
     /// Restart the current phase from the top.
     func reset() {
         abandonPhase(cancelAlarm: true)
+    }
+
+    /// Close the current short-break / long-break group and sit on a fresh
+    /// focus block. Completed sessions stay in Progress.
+    func startNewCycle() {
+        guard canStartNewCycle else { return }
+        applyFreshCycle()
     }
 
     /// Advance to the next phase without ringing and without recording a session.
@@ -298,6 +320,7 @@ final class TimerEngine {
         let alarms = alarmKit.allAlarms()
         reconcile(with: alarms)
         completeIfQuietDeadlinePassed()
+        expireStaleCycleIfNeeded()
     }
 
     /// Entry point for the Live Activity stop button (and swipe-to-dismiss
@@ -607,6 +630,7 @@ final class TimerEngine {
 
     private func applyRunning(endDate: Date) {
         state = .running(endDate: endDate)
+        markCycleActivity()
         scheduleCompletion(at: endDate)
         persist()
     }
@@ -615,6 +639,7 @@ final class TimerEngine {
         completionTask?.cancel()
         completionTask = nil
         state = .paused(remaining: max(0, remaining))
+        markCycleActivity()
         persist()
     }
 
@@ -673,7 +698,7 @@ final class TimerEngine {
     }
 
     private func complete(force: Bool) {
-        guard case .running = state else { return }
+        guard case .running(let endDate) = state else { return }
 
         if !force, let id = currentAlarmID {
             switch alarmKit.systemState(id: id) {
@@ -690,7 +715,11 @@ final class TimerEngine {
         finishedPhase = phase
         advance(recording: true)
         presentCompletionAlert()
+        // Stamp the wall-clock end, not "now", so a phase that finished
+        // hours ago can still close the group after the session is saved.
+        markCycleActivity(min(endDate, Date.now))
         persist()
+        expireStaleCycleIfNeeded()
         syncQuietLockScreen()
     }
 
@@ -756,6 +785,60 @@ final class TimerEngine {
             phase = .focus
         }
         state = .idle
+        markCycleActivity()
+    }
+
+    /// Drop the current cadence group. Does not delete recorded sessions.
+    private func applyFreshCycle(now: Date = .now) {
+        if !isAlarmPresented {
+            abandonPhase(cancelAlarm: true)
+        } else {
+            state = .idle
+        }
+        completedInCycle = 0
+        phase = .focus
+        markCycleActivity(now)
+        persist()
+        syncQuietLockScreen()
+    }
+
+    /// A still-counting block should not be reset under the user. Ringing
+    /// and paused leftovers can close the group — the phase already ended
+    /// or was abandoned.
+    private var isActivelyTiming: Bool {
+        if let id = currentAlarmID, alarmKit.systemState(id: id) == .countdown {
+            return true
+        }
+        if case .running(let endDate) = state, endDate > .now {
+            return true
+        }
+        return false
+    }
+
+    private func expireStaleCycleIfNeeded(now: Date = .now) {
+        guard CycleGroupPolicy.canStartNewCycle(
+            completedInCycle: completedInCycle,
+            phase: phase,
+            isAlarmPresented: false
+        ) else { return }
+        guard CycleGroupPolicy.shouldStartNewGroup(
+            lastActivityAt: lastCycleActivityAt ?? latestSessionEndedAt(),
+            now: now,
+            isActivelyTiming: isActivelyTiming
+        ) else { return }
+        applyFreshCycle(now: now)
+    }
+
+    private func markCycleActivity(_ date: Date = .now) {
+        lastCycleActivityAt = date
+    }
+
+    private func latestSessionEndedAt() -> Date? {
+        var descriptor = FetchDescriptor<PomodoroSession>(
+            sortBy: [SortDescriptor(\.endedAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+        return try? modelContext.fetch(descriptor).first?.endedAt
     }
 
     /// Count of focus sessions completed today (for the Time's up screen).
@@ -780,6 +863,7 @@ final class TimerEngine {
         static let pausedRemaining = "engine.pausedRemaining"
         static let runState = "engine.runState"
         static let isAlarmPresented = "engine.isAlarmPresented"
+        static let lastCycleActivityAt = "engine.lastCycleActivityAt"
     }
 
     /// App-owned lock-screen activity, used when AlarmKit is not presenting.
@@ -818,6 +902,11 @@ final class TimerEngine {
         } else {
             defaults.removeObject(forKey: PersistKey.currentAlarmID)
         }
+        if let lastCycleActivityAt {
+            defaults.set(lastCycleActivityAt, forKey: PersistKey.lastCycleActivityAt)
+        } else {
+            defaults.removeObject(forKey: PersistKey.lastCycleActivityAt)
+        }
         switch state {
         case .idle:
             defaults.set("idle", forKey: PersistKey.runState)
@@ -848,6 +937,11 @@ final class TimerEngine {
         if let raw = defaults.string(forKey: PersistKey.currentAlarmID),
            let id = UUID(uuidString: raw) {
             currentAlarmID = id
+        }
+        if let stored = defaults.object(forKey: PersistKey.lastCycleActivityAt) as? Date {
+            lastCycleActivityAt = stored
+        } else {
+            lastCycleActivityAt = latestSessionEndedAt()
         }
         switch defaults.string(forKey: PersistKey.runState) {
         case "running":

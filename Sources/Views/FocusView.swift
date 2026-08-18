@@ -6,6 +6,7 @@ struct FocusView: View {
     @Environment(SettingsStore.self) private var settings
     @State private var isScrubbing = false
     @State private var lastSeekProgress: Double?
+    @State private var confirmNewCycle = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -18,6 +19,30 @@ struct FocusView: View {
             Text(cycleHint)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+            if engine.canStartNewCycle {
+                Button("Start new cycle") {
+                    confirmNewCycle = true
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.pomodoroOrange)
+                .padding(.top, 10)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .contentShape(Rectangle())
+                .accessibilityHint("Closes this short-break group. Completed pomodoros stay on Progress.")
+                .confirmationDialog(
+                    "Start a new cycle?",
+                    isPresented: $confirmNewCycle,
+                    titleVisibility: .visible
+                ) {
+                    Button("Start new cycle") {
+                        engine.startNewCycle()
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("Completed pomodoros stay on Progress. The next focus will be 1 of \(settings.longBreakCadence).")
+                }
+            }
             Spacer()
             controls
             Text("Next up · \(settings.minutes(for: engine.nextPhase)) min \(engine.nextPhase.nextUpLabel)")
@@ -213,6 +238,7 @@ struct FocusView: View {
             circleButton(systemImage: "arrow.counterclockwise", size: 58) {
                 engine.reset()
             }
+            .accessibilityLabel("Reset")
 
             Button {
                 engine.togglePlayPause()
@@ -229,6 +255,7 @@ struct FocusView: View {
             circleButton(systemImage: "forward.end.fill", size: 58) {
                 engine.skip()
             }
+            .accessibilityLabel("Skip")
         }
     }
 

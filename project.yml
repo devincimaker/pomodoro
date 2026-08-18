@@ -1,0 +1,56 @@
+name: Pomodoro
+options:
+  bundleIdPrefix: com.devinci
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+targets:
+  Pomodoro:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      - Shared
+      - Resources
+    dependencies:
+      - target: PomodoroWidgets
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Pomodoro
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSSupportsLiveActivities: true
+        NSAlarmKitUsageDescription: Pomodoro rings an alarm at full volume when a focus session or break ends — even when your iPhone is locked or silenced.
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        TARGETED_DEVICE_FAMILY: "1"
+        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "1.0"
+
+  PomodoroWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Widget
+      - Shared
+    info:
+      path: WidgetInfo.plist
+      properties:
+        CFBundleDisplayName: Pomodoro
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devinci.Pomodoro.widgets
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "POMODORO_WIDGET $(inherited)"
+        TARGETED_DEVICE_FAMILY: "1"
+        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "1.0"
+        SKIP_INSTALL: true

@@ -1,8 +1,11 @@
 import SwiftUI
+import UIKit
 
 struct FocusView: View {
     @Environment(TimerEngine.self) private var engine
     @Environment(SettingsStore.self) private var settings
+    @State private var isScrubbing = false
+    @State private var lastSeekProgress: Double?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -69,44 +72,92 @@ struct FocusView: View {
     // MARK: Ring + countdown
 
     private var timerRing: some View {
-        ZStack {
-            // Only the ring needs a 0.5s tick. Rebuilding the digit Text
-            // on that cadence remounts the system timer and skips seconds.
-            TimelineView(.periodic(from: .now, by: 0.5)) { _ in
-                ZStack {
-                    Circle()
-                        .stroke(Color.ringTrack, style: StrokeStyle(lineWidth: 14, lineCap: .round))
+        GeometryReader { geo in
+            ZStack {
+                // Only the ring needs a 0.5s tick. Rebuilding the digit Text
+                // on that cadence remounts the system timer and skips seconds.
+                TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+                    ZStack {
+                        Circle()
+                            .stroke(Color.ringTrack, style: StrokeStyle(lineWidth: 14, lineCap: .round))
 
-                    Circle()
-                        .trim(from: 0, to: engine.progress)
-                        .stroke(
-                            Color.pomodoroOrange,
-                            style: StrokeStyle(lineWidth: 14, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .shadow(color: .pomodoroOrange.opacity(0.6), radius: 12)
-                        .animation(.linear(duration: 0.5), value: engine.progress)
+                        Circle()
+                            .trim(from: 0, to: engine.progress)
+                            .stroke(
+                                Color.pomodoroOrange,
+                                style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                            )
+                            .rotationEffect(.degrees(-90))
+                            .shadow(color: .pomodoroOrange.opacity(0.6), radius: 12)
+                            .animation(isScrubbing ? nil : .linear(duration: 0.5), value: engine.progress)
+                    }
+                }
+
+                VStack(spacing: 10) {
+                    countdownText
+                        .font(.system(size: 64, weight: .light, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(Color.cream)
+
+                    Text(engine.phase.title)
+                        .font(.footnote.weight(.semibold))
+                        .kerning(3)
+                        .foregroundStyle(.secondary)
                 }
             }
-
-            VStack(spacing: 10) {
-                countdownText
-                    .font(.system(size: 64, weight: .light, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(Color.cream)
-
-                Text(engine.phase.title)
-                    .font(.footnote.weight(.semibold))
-                    .kerning(3)
-                    .foregroundStyle(.secondary)
+            .contentShape(Rectangle())
+            .gesture(seekGesture(in: geo.size))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Timer")
+            .accessibilityValue(formatted(engine.remaining))
+            .accessibilityHint("Drag around the ring to adjust remaining time")
+            .accessibilityAdjustableAction { direction in
+                let step: TimeInterval = 60
+                switch direction {
+                case .increment:
+                    engine.seek(toRemaining: engine.remaining + step)
+                case .decrement:
+                    engine.seek(toRemaining: engine.remaining - step)
+                @unknown default:
+                    break
+                }
             }
         }
         .frame(width: 290, height: 290)
     }
 
+    private func seekGesture(in size: CGSize) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .local)
+            .onChanged { value in
+                guard let raw = RingSeek.progress(at: value.location, in: size) else { return }
+                let progress = RingSeek.clampedProgress(raw, previous: lastSeekProgress)
+                if !isScrubbing {
+                    isScrubbing = true
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.45)
+                }
+                lastSeekProgress = progress
+                engine.seek(progress: progress, rearm: false)
+            }
+            .onEnded { value in
+                guard isScrubbing else { return }
+                if let raw = RingSeek.progress(at: value.location, in: size) {
+                    engine.seek(
+                        progress: RingSeek.clampedProgress(raw, previous: lastSeekProgress),
+                        rearm: true
+                    )
+                } else if let lastSeekProgress {
+                    engine.seek(progress: lastSeekProgress, rearm: true)
+                }
+                isScrubbing = false
+                lastSeekProgress = nil
+            }
+    }
+
     @ViewBuilder
     private var countdownText: some View {
-        if let endDate = engine.endDate, endDate > .now {
+        if isScrubbing {
+            Text(formatted(engine.remaining))
+        } else if let endDate = engine.endDate, endDate > .now {
             let start = endDate.addingTimeInterval(-settings.duration(for: engine.phase))
             Text(timerInterval: start...endDate, countsDown: true, showsHours: false)
                 .id(endDate)

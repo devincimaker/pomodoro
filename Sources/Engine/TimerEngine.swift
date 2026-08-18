@@ -187,6 +187,29 @@ final class TimerEngine {
         isRunning ? pause() : start()
     }
 
+    /// Jump remaining time inside the current phase. Does not advance to the
+    /// next block and cannot complete the phase — remaining is clamped to
+    /// `RingSeek.remainingFloor...phaseDuration`.
+    ///
+    /// - Parameter remaining: Desired seconds left.
+    /// - Parameter rearm: `false` while the finger is down (clock and
+    ///   lock-screen preview move; any previously armed alert is dropped so
+    ///   it cannot fire at the old time). `true` on finger-up: reschedule
+    ///   AlarmKit or the quiet end-notification for the new remaining.
+    func seek(toRemaining remaining: TimeInterval, rearm: Bool = true) {
+        guard !isAlarmPresented else { return }
+        let clamped = RingSeek.clampedRemaining(remaining, total: settings.duration(for: phase))
+        applySeek(remaining: clamped, rearm: rearm)
+    }
+
+    /// Same as `seek(toRemaining:rearm:)` but takes ring progress `0...1`
+    /// (0 = full remaining, 1 = remaining floor).
+    func seek(progress: Double, rearm: Bool = true) {
+        guard !isAlarmPresented else { return }
+        let clamped = RingSeek.remaining(progress: progress, total: settings.duration(for: phase))
+        applySeek(remaining: clamped, rearm: rearm)
+    }
+
     /// Restart the current phase from the top.
     func reset() {
         abandonPhase(cancelAlarm: true)
@@ -332,6 +355,42 @@ final class TimerEngine {
         let duration = settings.duration(for: phase)
         applyRunning(endDate: Date.now.addingTimeInterval(duration))
         await armAlarm(seconds: duration)
+    }
+
+    // MARK: Seek
+
+    private func applySeek(remaining: TimeInterval, rearm: Bool) {
+        switch state {
+        case .idle, .paused:
+            applyPaused(remaining: remaining)
+            dropArmedAlerts()
+            syncQuietLockScreen()
+        case .running:
+            applyRunning(endDate: Date.now.addingTimeInterval(remaining))
+            dropArmedAlerts()
+            if rearm {
+                alarmKitAttempted = !settings.alertStyle.usesAlarmKit
+                syncQuietLockScreen()
+                Task { await armAlarm(seconds: remaining) }
+            } else {
+                alarmKitAttempted = true
+                syncQuietLockScreen()
+            }
+        }
+    }
+
+    /// Cancels AlarmKit + the quiet end-notification and invalidates any
+    /// in-flight `armAlarm` so a stale schedule cannot fire after a scrub.
+    private func dropArmedAlerts() {
+        armGeneration += 1
+        isMutatingAlarms = true
+        NotificationManager.shared.cancelEndNotification()
+        if let id = currentAlarmID {
+            alarmKit.dismiss(id: id, state: nil)
+        }
+        alarmKit.cancelAll(except: nil)
+        currentAlarmID = nil
+        isMutatingAlarms = false
     }
 
     // MARK: Alarm arming

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0116859E145C91E9724663A2 /* PomodoroAlarmMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE2151E52685446949FFCB9 /* PomodoroAlarmMetadata.swift */; };
+		0E93F361AC70DEAEB73F48DE /* TimerEngineSeekTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24448353291981537FF2BDEB /* TimerEngineSeekTests.swift */; };
 		100702C75FAE05306C3A2CCB /* PomodoroLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C233328BA9EC537153243953 /* PomodoroLiveActivity.swift */; };
 		11E46678A4B0345900746B73 /* PomodoroAlarmMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE2151E52685446949FFCB9 /* PomodoroAlarmMetadata.swift */; };
 		14360AD28CD8DEB69B71DE77 /* AlarmControlIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FA126CB60170D28797B3C4 /* AlarmControlIntents.swift */; };
@@ -38,9 +39,11 @@
 		D14DF730DA31263DC1717047 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C80955181DC9D7526BD0C /* RootView.swift */; };
 		D6A75907625B6F979E1064F9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DF48B9D6CF161153EEBCB2 /* Theme.swift */; };
 		D8F1B2F06C0E29219D3A1A61 /* TimesUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA06B063B08B854872D7EF /* TimesUpView.swift */; };
+		DD8210089785C346AF09B142 /* RingSeekTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB61DAF7E5587E344CE772B /* RingSeekTests.swift */; };
 		DD934CC6F43177A7AE85A7A4 /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7741B1F3DD104AF905127F /* Phase.swift */; };
 		E8B99BCD025A408CDF909ABA /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */; };
 		F7D6CA92FED1E5FE082FE6EF /* PomodoroActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4542D0C7308ECD4AFC277 /* PomodoroActivityAttributes.swift */; };
+		F824AAB7C10D3E4A571DD304 /* RingSeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D85BD2AD958C04FDFF3F6B /* RingSeek.swift */; };
 		FF7507F1E4E7A14BA782536E /* TimerEngineQuietLockScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10E611F3E4BD847BC5D716A /* TimerEngineQuietLockScreenTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -78,6 +81,7 @@
 /* Begin PBXFileReference section */
 		13AE08D9A779DE0DA2F45A23 /* PomodoroTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PomodoroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A9C80955181DC9D7526BD0C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		24448353291981537FF2BDEB /* TimerEngineSeekTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerEngineSeekTests.swift; sourceTree = "<group>"; };
 		30AA06B063B08B854872D7EF /* TimesUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimesUpView.swift; sourceTree = "<group>"; };
 		3716CA2557A4A05DA82631C7 /* QuietLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietLiveActivityController.swift; sourceTree = "<group>"; };
 		4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
@@ -88,6 +92,8 @@
 		6793956556147C36C2D1B91F /* siren.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = siren.wav; sourceTree = "<group>"; };
 		6FCBB280AD7F99E6333A3F4B /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		792E7EAC02F57ABE9CD5BDE8 /* AudioRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRoute.swift; sourceTree = "<group>"; };
+		7AB61DAF7E5587E344CE772B /* RingSeekTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingSeekTests.swift; sourceTree = "<group>"; };
+		82D85BD2AD958C04FDFF3F6B /* RingSeek.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingSeek.swift; sourceTree = "<group>"; };
 		87FA126CB60170D28797B3C4 /* AlarmControlIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmControlIntents.swift; sourceTree = "<group>"; };
 		961B8B54325FF6DC0643EF82 /* beep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = beep.wav; sourceTree = "<group>"; };
 		9AE2151E52685446949FFCB9 /* PomodoroAlarmMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroAlarmMetadata.swift; sourceTree = "<group>"; };
@@ -186,6 +192,7 @@
 				4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */,
 				3716CA2557A4A05DA82631C7 /* QuietLiveActivityController.swift */,
 				B56696D3E51376B8474C5798 /* QuietLockScreenPolicy.swift */,
+				82D85BD2AD958C04FDFF3F6B /* RingSeek.swift */,
 				667206E5CE8C07A5065422F3 /* TimerEngine.swift */,
 			);
 			path = Engine;
@@ -195,8 +202,10 @@
 			isa = PBXGroup;
 			children = (
 				5170E0BC1CD36FE704726783 /* QuietLockScreenPolicyTests.swift */,
+				7AB61DAF7E5587E344CE772B /* RingSeekTests.swift */,
 				F2DFE2CADA03898A006A3CDA /* TestSupport.swift */,
 				E10E611F3E4BD847BC5D716A /* TimerEngineQuietLockScreenTests.swift */,
+				24448353291981537FF2BDEB /* TimerEngineSeekTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -345,8 +354,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				3AC5BB33E5F7A8AFFCBB1E0C /* QuietLockScreenPolicyTests.swift in Sources */,
+				DD8210089785C346AF09B142 /* RingSeekTests.swift in Sources */,
 				61892B92733929495D75FD7C /* TestSupport.swift in Sources */,
 				FF7507F1E4E7A14BA782536E /* TimerEngineQuietLockScreenTests.swift in Sources */,
+				0E93F361AC70DEAEB73F48DE /* TimerEngineSeekTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,6 +379,7 @@
 				2D0783C732A2CA346035ADBC /* ProgressScreen.swift in Sources */,
 				2563AF4244CA2ACD71903C2D /* QuietLiveActivityController.swift in Sources */,
 				94A5C27AD19B56FA8D1315B7 /* QuietLockScreenPolicy.swift in Sources */,
+				F824AAB7C10D3E4A571DD304 /* RingSeek.swift in Sources */,
 				D14DF730DA31263DC1717047 /* RootView.swift in Sources */,
 				423237FD8BFA1A3007A1EAD0 /* SettingsScreen.swift in Sources */,
 				81EA0AFB75A607D70B6E91F6 /* SettingsStore.swift in Sources */,

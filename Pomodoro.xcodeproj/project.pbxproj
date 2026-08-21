@@ -40,11 +40,13 @@
 		B641DBAEA73C6B16277F8C7B /* AlarmControlIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FA126CB60170D28797B3C4 /* AlarmControlIntents.swift */; };
 		BF4E4E721579E83E8CFC710B /* siren.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6793956556147C36C2D1B91F /* siren.wav */; };
 		D14DF730DA31263DC1717047 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C80955181DC9D7526BD0C /* RootView.swift */; };
+		D5E915AEA21AC89B4DD33F05 /* DailyCountScaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C641B283732BCC0B03E8A2B /* DailyCountScaleTests.swift */; };
 		D6A75907625B6F979E1064F9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DF48B9D6CF161153EEBCB2 /* Theme.swift */; };
 		D8F1B2F06C0E29219D3A1A61 /* TimesUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA06B063B08B854872D7EF /* TimesUpView.swift */; };
 		DD8210089785C346AF09B142 /* RingSeekTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB61DAF7E5587E344CE772B /* RingSeekTests.swift */; };
 		DD934CC6F43177A7AE85A7A4 /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7741B1F3DD104AF905127F /* Phase.swift */; };
 		E8B99BCD025A408CDF909ABA /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B9F9D8529D5FF602084D4 /* NotificationManager.swift */; };
+		EA37BF2DC5354FF9E1E620C6 /* DailyCountScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AD7E9E19012DDBA833791A /* DailyCountScale.swift */; };
 		F7D6CA92FED1E5FE082FE6EF /* PomodoroActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4542D0C7308ECD4AFC277 /* PomodoroActivityAttributes.swift */; };
 		F824AAB7C10D3E4A571DD304 /* RingSeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D85BD2AD958C04FDFF3F6B /* RingSeek.swift */; };
 		FF7507F1E4E7A14BA782536E /* TimerEngineQuietLockScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10E611F3E4BD847BC5D716A /* TimerEngineQuietLockScreenTests.swift */; };
@@ -82,8 +84,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		11AD7E9E19012DDBA833791A /* DailyCountScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCountScale.swift; sourceTree = "<group>"; };
 		13AE08D9A779DE0DA2F45A23 /* PomodoroTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PomodoroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A9C80955181DC9D7526BD0C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		1C641B283732BCC0B03E8A2B /* DailyCountScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCountScaleTests.swift; sourceTree = "<group>"; };
 		24448353291981537FF2BDEB /* TimerEngineSeekTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerEngineSeekTests.swift; sourceTree = "<group>"; };
 		30AA06B063B08B854872D7EF /* TimesUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimesUpView.swift; sourceTree = "<group>"; };
 		3716CA2557A4A05DA82631C7 /* QuietLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietLiveActivityController.swift; sourceTree = "<group>"; };
@@ -180,6 +184,7 @@
 		9C0B5EEBF44331E7FFB7AFCD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				11AD7E9E19012DDBA833791A /* DailyCountScale.swift */,
 				6FCBB280AD7F99E6333A3F4B /* FocusView.swift */,
 				BCD18DA796F85C1A172A271B /* ProgressScreen.swift */,
 				1A9C80955181DC9D7526BD0C /* RootView.swift */,
@@ -209,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				E2D18FAD757759CDD3F6E6FA /* CycleGroupPolicyTests.swift */,
+				1C641B283732BCC0B03E8A2B /* DailyCountScaleTests.swift */,
 				5170E0BC1CD36FE704726783 /* QuietLockScreenPolicyTests.swift */,
 				7AB61DAF7E5587E344CE772B /* RingSeekTests.swift */,
 				F2DFE2CADA03898A006A3CDA /* TestSupport.swift */,
@@ -363,6 +369,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AD6D664147810FEBF838F2A /* CycleGroupPolicyTests.swift in Sources */,
+				D5E915AEA21AC89B4DD33F05 /* DailyCountScaleTests.swift in Sources */,
 				3AC5BB33E5F7A8AFFCBB1E0C /* QuietLockScreenPolicyTests.swift in Sources */,
 				DD8210089785C346AF09B142 /* RingSeekTests.swift in Sources */,
 				61892B92733929495D75FD7C /* TestSupport.swift in Sources */,
@@ -381,6 +388,7 @@
 				19099A0760B786F0F2E09468 /* AlarmScheduler.swift in Sources */,
 				5714F1CE056617F42C6B92F8 /* AudioRoute.swift in Sources */,
 				775AC902059DC41A8D42A028 /* CycleGroupPolicy.swift in Sources */,
+				EA37BF2DC5354FF9E1E620C6 /* DailyCountScale.swift in Sources */,
 				259AE84A027D10A95436B21E /* FocusView.swift in Sources */,
 				E8B99BCD025A408CDF909ABA /* NotificationManager.swift in Sources */,
 				55A39F9B27E7690956C00C70 /* Phase.swift in Sources */,

@@ -173,6 +173,10 @@ struct ProgressScreen: View {
         }
     }
 
+    private var yScale: DailyCountScale {
+        DailyCountScale(peak: dailyCounts.map(\.count).max() ?? 0)
+    }
+
     private var chartCard: some View {
         let counts = dailyCounts
         let today = Calendar.current.startOfDay(for: .now)
@@ -184,7 +188,7 @@ struct ProgressScreen: View {
                     .foregroundStyle(Color.cream)
                 Spacer()
                 Text("\(rangeSessions.count) pomodoros")
-                    .font(.subheadline)
+                    .font(.subheadline.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
 
@@ -197,15 +201,60 @@ struct ProgressScreen: View {
                     day.date == today ? Color.pomodoroOrange : Color.white.opacity(0.12)
                 )
                 .cornerRadius(6)
-            }
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .day, count: range == .week ? 1 : 7)) { _ in
-                    AxisValueLabel(format: .dateTime.weekday(.narrow), centered: true)
-                        .foregroundStyle(Color.secondary)
+                .annotation(position: .top, spacing: 4) {
+                    if range == .week, day.count > 0 {
+                        Text("\(day.count)")
+                            .font(.caption.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(
+                                day.date == today ? Color.pomodoroOrange : Color.cream.opacity(0.72)
+                            )
+                            .accessibilityHidden(true)
+                    }
                 }
             }
-            .chartYAxis(.hidden)
-            .frame(height: 180)
+            .chartXAxis {
+                if range == .week {
+                    AxisMarks(values: counts.map(\.date)) { _ in }
+                } else {
+                    AxisMarks(values: .stride(by: .day, count: 7)) { _ in
+                        AxisValueLabel(format: .dateTime.weekday(.narrow), centered: true)
+                            .foregroundStyle(Color.secondary)
+                    }
+                }
+            }
+            .chartYScale(domain: 0...yScale.upperBound)
+            .chartYAxis {
+                AxisMarks(position: .leading, values: yScale.ticks) { value in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
+                        .foregroundStyle(Color.white.opacity(0.08))
+                    AxisValueLabel {
+                        if let count = value.as(Int.self) {
+                            Text("\(count)")
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(Color.secondary)
+                        }
+                    }
+                }
+            }
+            .chartPlotStyle { plot in
+                plot.padding(.top, range == .week ? 20 : 4)
+            }
+            .frame(height: range == .week ? 188 : 180)
+
+            if range == .week {
+                HStack(spacing: 0) {
+                    Text("\(yScale.upperBound)")
+                        .font(.caption2.monospacedDigit())
+                        .hidden()
+                    ForEach(counts) { day in
+                        Text(day.date, format: .dateTime.weekday(.narrow))
+                            .font(.caption2)
+                            .foregroundStyle(Color.secondary)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .accessibilityHidden(true)
+            }
         }
         .padding(18)
         .background(RoundedRectangle(cornerRadius: 18).fill(Color.cardSurface))
